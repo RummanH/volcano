@@ -5,6 +5,7 @@ const { httpGetAllVolcanos } = require("../controllers/volcano.controller");
 
 const router = Router();
 
-router.route("/").get(catchAsync(httpGetAllVolcanos));
+router.route("/volcanoes").get(catchAsync(httpGetAllVolcanos));
+router.route("/volcanoes").get(catchAsync(httpGetAllVolcanos));
 
 module.exports = router;

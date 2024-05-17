@@ -19,7 +19,7 @@ app.use(helmet());
 
 app.use(cors(corsOptions));
 
-app.use("/tests", volcanoRouter);
+app.use("/", volcanoRouter);
 
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
