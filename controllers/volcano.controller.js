@@ -16,6 +16,21 @@ async function httpGetAllVolcanos(req, res, next) {
   });
 }
 
+
+async function httpGetOneVolcano(req, res, next) {
+  const { id } = req.params;
+  const users = await db('data').where('id', id).first();
+  const payload = {};
+  return sendResponse({
+    status: "success",
+    statusCode: 200,
+    message: "Get tests successfully!",
+    payload : users,
+    res,
+  });
+}
+
 module.exports = {
   httpGetAllVolcanos,
+  httpGetOneVolcano
 };
