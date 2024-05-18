@@ -12,7 +12,6 @@ function sendErrorDev(err, res) {
 }
 
 function sendErrorProd(err, req, res) {
-  // operation error that I CREATED
   if (err.isOperational) {
     return sendResponse({
       status: err.status,

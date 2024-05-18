@@ -8,6 +8,7 @@ const cors = require("cors");
 const globalErrorHandler = require("./controllers/error.controller");
 const corsOptions = require("./services/corsOptions");
 const volcanoRouter = require("./routes/volcano.routes");
+const userRouter = require("./routes/user.router");
 const AppError = require("./services/AppError");
 const app = express();
 // app.use(express.static(path.join(__dirname, "..", "public")));
@@ -19,9 +20,12 @@ const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'swag
 
 
 app.use("/", volcanoRouter);
+app.use("/user", userRouter);
+
+
+
 app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-
+app.use(express.json());
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
