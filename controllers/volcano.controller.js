@@ -5,6 +5,9 @@ const db = knex(knexConfig);
 
 async function httpGetAllVolcanos(req, res, next) {
   const {country,populatedWithin} = req.query;
+  if (!country) {
+    return res.status(200).json({ error: true, message: "Country is a required query parameter." });
+  }
   // Build the base query
   let query = db('data').select('id', 'name', 'region', 'subregion')
     .where('country', country);
@@ -19,15 +22,21 @@ async function httpGetAllVolcanos(req, res, next) {
     });
   }
   const users = await query;
-  res.json(users);   
+  res.status(400).json(users);   
 }
 
 
 async function httpGetOneVolcano(req, res, next) {
   const { id } = req.params;
-  const users = await db('data').select('id','name','country','region','subregion','last_eruption','summit','elevation','latitude','longitude')
+  if(Object.keys(req.query).length > 0){
+    return res.status(400).json({ error: true, message: "Invalid query parameters. Query parameters are not permitted." });
+  }
+  const volcano = await db('data').select('id','name','country','region','subregion','last_eruption','summit','elevation','latitude','longitude')
   .where('id', id).first();
-  res.json(users);
+  if(!volcano){
+    return res.status(404).json({ error: true, message: `Volcano with ID: ${id} not found.` });
+  }
+  res.status(200).json(volcano);
 }
 
 
