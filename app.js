@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== "production") {
 // API Routes
 app.use("/", volcanoRouter);
 app.use("/user", userRouter);
-app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/me", getMe);
 
 
