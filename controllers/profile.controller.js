@@ -22,6 +22,7 @@ async function httpGetProfile(req, res, next) {
   return res.status(200).json(user);
 }
 
+
 async function httpUpdateProfile(req, res, next) {
   const { firstName, lastName, dob, address } = req.body;
   const { email } = req.params;
@@ -72,4 +73,4 @@ async function getMe(req, res, next) {
   return res.status(200).json(meObject);
 }
 
-module.exports = { httpGetProfile, httpUpdateProfile, getMe };
+module.exports = {  httpGetProfile, httpUpdateProfile, getMe };

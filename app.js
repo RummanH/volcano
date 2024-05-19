@@ -34,9 +34,10 @@ if (process.env.NODE_ENV !== "production") {
 // API Routes
 app.use("/", volcanoRouter);
 app.use("/user", userRouter);
+app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/me", getMe);
 
-app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 app.all("*", (req, res, next) => next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404)));
 app.use(globalErrorHandler);
