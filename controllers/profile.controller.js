@@ -1,27 +1,38 @@
+const { promisify } = require("util");
+const knex = require("knex");
+const knexConfig = require("../knexfile").development;
+const db = knex(knexConfig);
+const jwt = require("jsonwebtoken");
+
 async function httpGetProfile(req, res, next) {
   const { email } = req.params;
 
-  const userNotExist = false;
-  if (userNotExist) {
-    return res.status(400).json({ error: true, message: "User not found" });
+  let decodedObject;
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    const token = req.headers.authorization.split(" ")[1];
+    decodedObject = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   }
 
-  const isJWTExpired = false;
-  if (isJWTExpired) {
-    return res.status(401).json({ error: true, message: "JWT token has expired" });
+  const user = await db("user").select("*").where("email", email);
+  if (!user.length) {
+    return res.status(404).json({ error: true, message: "User not found" });
   }
 
-  const user = {
-    email: "mike@gmail.com",
-    firstName: "Michael",
-    lastName: "Jordan",
-    dob: "1963-02-17",
-    address: "123 Fake Street, Springfield",
+  const userObject = {
+    email: user[0].email,
+    firstName: user[0].firstName,
+    lastName: user[0].lastName,
+    dob: user[0].dob,
+    address: user[0].address,
   };
 
-  return res.status(200).json(user);
-}
+  if (!decodedObject) {
+    delete userObject.address;
+    delete userObject.dob;
+  }
 
+  return res.status(200).json(userObject);
+}
 
 async function httpUpdateProfile(req, res, next) {
   const { firstName, lastName, dob, address } = req.body;
@@ -33,10 +44,22 @@ async function httpUpdateProfile(req, res, next) {
       .json({ error: true, message: "Request body incomplete: firstName, lastName, dob and address are required." });
   }
 
-  const token = null;
+  if (typeof firstName !== "string" || typeof lastName !== "string" || typeof address !== "string") {
+    return res
+      .status(400)
+      .json({ error: true, message: "Request body invalid: firstName, lastName and address must be strings only." });
+  }
+
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
   if (!token) {
     return res.status(401).json({ error: true, message: "Authorization header ('Bearer token') not found" });
   }
+
+  const decodedObject = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   const notSameUser = false;
   if (notSameUser) {
@@ -48,20 +71,17 @@ async function httpUpdateProfile(req, res, next) {
     return res.status(400).json({ error: true, message: "User not found" });
   }
 
-  const isJWTExpired = false;
-  if (isJWTExpired) {
-    return res.status(401).json({ error: true, message: "JWT token has expired" });
+  if (decodedObject.email !== email) {
+    return res.status(403).json({
+      error: true,
+      message: "Forbidden",
+    });
   }
 
-  const user = {
-    email: "mike@gmail.com",
-    firstName: "Michael",
-    lastName: "Jordan",
-    dob: "1963-02-17",
-    address: "123 Fake Street, Springfield",
-  };
+  await db("user").where({ email }).update({ firstName, lastName, dob, address });
+  const updatedUser = await db("user").select("*").where("email", email);
 
-  return res.status(200).json(user);
+  return res.status(200).json(updatedUser);
 }
 
 async function getMe(req, res, next) {
@@ -73,4 +93,4 @@ async function getMe(req, res, next) {
   return res.status(200).json(meObject);
 }
 
-module.exports = {  httpGetProfile, httpUpdateProfile, getMe };
+module.exports = { httpGetProfile, httpUpdateProfile, getMe };
