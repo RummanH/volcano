@@ -18,11 +18,9 @@ const userRouter = require("./routes/user.router");
 const AppError = require("./services/AppError");
 
 const app = express();
-// app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use(helmet());
-app.use(cors(corsOptions));
-// Read the Swagger JSON file
+
 const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, "swagger.json"), "utf-8"));
 
 app.use(express.json());
@@ -36,8 +34,6 @@ app.use("/", volcanoRouter);
 app.use("/user", userRouter);
 app.get("/me", getMe);
 app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-
 
 app.all("*", (req, res, next) => next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404)));
 app.use(globalErrorHandler);

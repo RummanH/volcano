@@ -3,6 +3,18 @@ const knex = require("knex");
 const knexConfig = require("../knexfile").development;
 const db = knex(knexConfig);
 const jwt = require("jsonwebtoken");
+const validator = require("validator");
+
+function isValidDate(dateString) {
+  const dateFormat = /^\d{4}-\d{2}-\d{2}$/;
+
+  if (!dateString.match(dateFormat)) {
+    return false;
+  }
+
+  const date = new Date(dateString);
+  return !isNaN(date) && date.toISOString().slice(0, 10) === dateString;
+}
 
 async function httpGetProfile(req, res, next) {
   const { email } = req.params;
@@ -50,6 +62,17 @@ async function httpUpdateProfile(req, res, next) {
       .json({ error: true, message: "Request body invalid: firstName, lastName and address must be strings only." });
   }
 
+  if (!isValidDate(dob)) {
+    return res
+      .status(400)
+      .json({ error: true, message: "Invalid input: dob must be a real date in format YYYY-MM-DD." });
+  }
+
+  const isPast = new Date(dob) < new Date(Date.now());
+  if (!isPast) {
+    return res.status(400).json({ error: true, message: "Invalid input: dob must be a date in the past." });
+  }
+
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
@@ -61,16 +84,6 @@ async function httpUpdateProfile(req, res, next) {
 
   const decodedObject = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  const notSameUser = false;
-  if (notSameUser) {
-    return res.status(400).json({ error: true, message: "Forbidden" });
-  }
-
-  const userNotExist = false;
-  if (userNotExist) {
-    return res.status(400).json({ error: true, message: "User not found" });
-  }
-
   if (decodedObject.email !== email) {
     return res.status(403).json({
       error: true,
@@ -79,7 +92,8 @@ async function httpUpdateProfile(req, res, next) {
   }
 
   await db("user").where({ email }).update({ firstName, lastName, dob, address });
-  const updatedUser = await db("user").select("*").where("email", email);
+  const updatedUser = await db("user").select("*").where("email", email).first();
+  updatedUser.password = undefined;
 
   return res.status(200).json(updatedUser);
 }
