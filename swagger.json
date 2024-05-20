@@ -372,7 +372,7 @@
           }
         }
       }
-    },
+    },   
     "/volcano/{id}": {
       "get": {
         "tags": ["Data"],
@@ -513,6 +513,215 @@
         }
       }
     },
+    "/volcanoes": {
+      "get": {
+        "tags": ["Data"],
+        "description": "Returns a list of volcanoes that are associated with the queried country. The country query parameter is required. The list can optionally be filtered by using the populatedWithin query parameter. This will return a filtered list of volcanoes that have at least one person living within the provided radius.",
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "description": "Name of country",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "populatedWithin",
+            "in": "query",
+            "description": "Distance within X km of a volcano",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["5km", "10km", "30km", "100km"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of objects containing id, name, country, region and subregion properties. An example of one object in the array is shown below.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "example": "1"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Abu"
+                      },
+                      "country": {
+                        "type": "string",
+                        "example": "Japan"
+                      },
+                      "region": {
+                        "type": "string",
+                        "example": "Japan, Taiwan, Marianas"
+                      },
+                      "subregion": {
+                        "type": "string",
+                        "example": "Honshu"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing country query parameter or query parameters invalid. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/MissingCountryParameterVolcanoes"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidParametersVolcanoes"
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidPopulatedWithinParameterVolcanoes"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Data"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Creates a new volcano record. All parameters are required in the request body.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Name of the volcano",
+                    "example": "Abu"
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "Name of the country where the volcano is located",
+                    "example": "Japan"
+                  },
+                  "region": {
+                    "type": "string",
+                    "description": "Region of the volcano",
+                    "example": "Japan, Taiwan, Marianas"
+                  },
+                  "subregion": {
+                    "type": "string",
+                    "description": "Subregion of the volcano",
+                    "example": "Honshu"
+                  },
+                  "last_eruption": {
+                    "type": "string",
+                    "description": "Date of the last eruption",
+                    "example": "2020-01-01"
+                  },
+                  "summit": {
+                    "type": "string",
+                    "description": "Summit of the volcano",
+                    "example": "3776m"
+                  },
+                  "elevation": {
+                    "type": "number",
+                    "description": "Elevation of the volcano in meters",
+                    "example": 3776
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Latitude of the volcano",
+                    "example": 35.3606
+                  },
+                  "population_5km": {
+                    "type": "integer",
+                    "description": "Population within 5km of the volcano",
+                    "example": 1000
+                  },
+                  "population_10km": {
+                    "type": "integer",
+                    "description": "Population within 10km of the volcano",
+                    "example": 5000
+                  },
+                  "population_30km": {
+                    "type": "integer",
+                    "description": "Population within 30km of the volcano",
+                    "example": 20000
+                  },
+                  "population_100km": {
+                    "type": "integer",
+                    "description": "Population within 100km of the volcano",
+                    "example": 100000
+                  }
+                },
+                "required": [
+                  "name", "country", "region", "subregion", "last_eruption", "summit", "elevation", "latitude",
+                  "population_5km", "population_10km", "population_30km", "population_100km"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Volcano created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "New volcano data created"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, object invalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid request payload. name missing"
+                    }
+
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }, 
     "/user/register": {
       "post": {
         "tags": ["Authentication"],
