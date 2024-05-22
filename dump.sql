@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
--- Host: sql12.freesqldatabase.com
--- Generation Time: May 20, 2024 at 06:19 PM
--- Server version: 5.5.62-0ubuntu0.14.04.1
--- PHP Version: 7.0.33-0ubuntu0.16.04.16
+-- Host: 127.0.0.1
+-- Generation Time: May 22, 2024 at 08:20 AM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.0.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `sql12707529`
+-- Database: `volcanoes`
 --
 
 -- --------------------------------------------------------
@@ -35,15 +34,15 @@ CREATE TABLE `data` (
   `region` varchar(30) NOT NULL,
   `subregion` varchar(40) NOT NULL,
   `last_eruption` varchar(10) NOT NULL,
-  `summit` int(11) NOT NULL DEFAULT '0',
-  `elevation` int(11) NOT NULL DEFAULT '0',
-  `population_5km` int(11) DEFAULT '0',
-  `population_10km` int(11) DEFAULT '0',
-  `population_30km` int(11) DEFAULT '0',
-  `population_100km` int(11) DEFAULT '0',
+  `summit` int(11) NOT NULL DEFAULT 0,
+  `elevation` int(11) NOT NULL DEFAULT 0,
+  `population_5km` int(11) DEFAULT 0,
+  `population_10km` int(11) DEFAULT 0,
+  `population_30km` int(11) DEFAULT 0,
+  `population_100km` int(11) DEFAULT 0,
   `latitude` decimal(10,4) NOT NULL,
   `longitude` decimal(11,4) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `data`
@@ -1405,20 +1404,13 @@ INSERT INTO `data` (`id`, `name`, `country`, `region`, `subregion`, `last_erupti
 
 CREATE TABLE `user` (
   `id` int(11) NOT NULL,
-  `firstName` text NOT NULL,
-  `lastName` text NOT NULL,
-  `dob` text NOT NULL,
-  `address` text NOT NULL,
+  `firstName` text NOT NULL DEFAULT '',
+  `lastName` text NOT NULL DEFAULT '',
+  `dob` text NOT NULL DEFAULT '',
+  `address` text NOT NULL DEFAULT '',
   `email` text NOT NULL,
   `password` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `user`
---
-
-INSERT INTO `user` (`id`, `firstName`, `lastName`, `dob`, `address`, `email`, `password`) VALUES
-(10, '', '', '', '', 'arfin@gmail.com', '$2a$10$sBo0NQ7xoAgY3F/Dq5dsTeW.1dftYIA.xDC1Jf8dI4BhrKFU0.82m');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -1445,12 +1437,14 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `data`
 --
 ALTER TABLE `data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1351;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1344;
+
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;COMMIT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

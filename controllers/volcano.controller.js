@@ -22,20 +22,14 @@ async function httpGetAllVolcanos(req, res, next) {
   if (!country) {
     return res.status(400).json({ error: true, message: "Country is a required query parameter." });
   }
-  // Build the base query
-  let query = db("data").select("id", "name", "region", "subregion").where("country", country);
 
+  const populatedQuery = `population_${populatedWithin}`;
+  // Build the base query
+  const volcanoes = await db("data").select("id", "name","country", "region", "subregion").where("country", country)
+  .andWhere(populatedQuery,">", 0);
   // Add population conditions only if populatedWithin is provided
-  if (populatedWithin) {
-    query = query.andWhere(function () {
-      this.orWhere("population_5km", populatedWithin)
-        .orWhere("population_10km", populatedWithin)
-        .orWhere("population_30km", populatedWithin)
-        .orWhere("population_100km", populatedWithin);
-    });
-  }
-  const users = await query;
-  res.status(200).json(users);
+  
+  res.status(200).json(volcanoes);
 }
 
 async function httpGetOneVolcano(req, res, next) {
@@ -68,10 +62,16 @@ async function httpGetOneVolcano(req, res, next) {
     return res.status(404).json({ error: true, message: `Volcano with ID: ${id} not found.` });
   }
 
-  let token;
+
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-    await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const parts = req.headers.authorization.split(' ');
+    if (parts.length === 2 && parts[0] === 'Bearer' && parts[1].match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
+      const token = req.headers.authorization.split(" ")[1];
+      await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    } else {
+      return res.status(401).json({ error:true, message: 'Authorization header is malformed' });
+    }
+    
   }
 
   if (!req.headers.authorization) {

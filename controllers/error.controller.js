@@ -17,6 +17,10 @@ function handleTokenExpireError() {
   return new AppError("JWT token has expired", 401);
 }
 
+// function handleTokenUnauthorizedError(){
+//   return new AppError("Authorization header is malformed", 401);
+// }
+
 function globalErrorHandler(err, req, res, next) {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
@@ -25,6 +29,7 @@ function globalErrorHandler(err, req, res, next) {
 
   if (err.name === "JsonWebTokenError") err = handleJWTError();
   if (err.name === "TokenExpiredError") err = handleTokenExpireError();
+  // if (err.name === "UnauthorizedError") err = handleTokenUnauthorizedError();
   sendErrorDev(err, res);
 }
 
