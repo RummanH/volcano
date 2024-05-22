@@ -17,12 +17,29 @@ const corsOptions = require("./services/corsOptions");
 const userRouter = require("./routes/user.router");
 const AppError = require("./services/AppError");
 
+const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, "swagger.json"), "utf-8"));
+
 const app = express();
+
+// app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+// Custom middleware to serve Swagger at the root route
+app.use("/", (req, res, next) => {
+  if (req.path === '/') {
+    swaggerUi.setup(swaggerDocument)(req, res, next);
+  } else {
+    next();
+  }
+});
+
+// Serve Swagger UI assets
+app.use("/", swaggerUi.serve);
+
 
 app.use(helmet());
 app.use(cors());
 
-const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, "swagger.json"), "utf-8"));
+
 
 app.use(express.json());
 
@@ -34,8 +51,6 @@ if (process.env.NODE_ENV !== "production") {
 app.use("/", volcanoRouter);
 app.use("/user", userRouter);
 app.get("/me", getMe);
-app.get("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 app.all("*", (req, res, next) => next(new AppError(`Not Found`, 404)));
 app.use(globalErrorHandler);
 
