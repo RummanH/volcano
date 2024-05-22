@@ -19,11 +19,7 @@ function isValidDate(dateString) {
 async function httpGetProfile(req, res, next) {
   const { email } = req.params;
 
-  // let decodedObject;
-  // if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-  //   const token = req.headers.authorization.split(" ")[1];
-  //   decodedObject = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  // }
+  let decodedObject;
 
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     const parts = req.headers.authorization.split(" ");
