@@ -20,6 +20,7 @@ const AppError = require("./services/AppError");
 const app = express();
 
 app.use(helmet());
+app.use(cors());
 
 const swaggerDocument = JSON.parse(fs.readFileSync(path.resolve(__dirname, "swagger.json"), "utf-8"));
 
@@ -33,9 +34,9 @@ if (process.env.NODE_ENV !== "production") {
 app.use("/", volcanoRouter);
 app.use("/user", userRouter);
 app.get("/me", getMe);
-app.use("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.get("/", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.all("*", (req, res, next) => next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404)));
+app.all("*", (req, res, next) => next(new AppError(`Not Found`, 404)));
 app.use(globalErrorHandler);
 
 module.exports = app;

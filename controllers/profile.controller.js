@@ -19,10 +19,24 @@ function isValidDate(dateString) {
 async function httpGetProfile(req, res, next) {
   const { email } = req.params;
 
-  let decodedObject;
+  // let decodedObject;
+  // if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+  //   const token = req.headers.authorization.split(" ")[1];
+  //   decodedObject = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  // }
+
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    const token = req.headers.authorization.split(" ")[1];
-    decodedObject = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const parts = req.headers.authorization.split(" ");
+    if (
+      parts.length === 2 &&
+      parts[0] === "Bearer" &&
+      parts[1].match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
+    ) {
+      const token = req.headers.authorization.split(" ")[1];
+      decodedObject = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    } else {
+      return res.status(401).json({ error: true, message: "Authorization header is malformed" });
+    }
   }
 
   const user = await db("user").select("*").where("email", email);
@@ -39,6 +53,11 @@ async function httpGetProfile(req, res, next) {
   };
 
   if (!decodedObject) {
+    delete userObject.address;
+    delete userObject.dob;
+  }
+
+  if (decodedObject?.email !== email) {
     delete userObject.address;
     delete userObject.dob;
   }
@@ -74,8 +93,18 @@ async function httpUpdateProfile(req, res, next) {
   }
 
   let token;
+
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
+    const parts = req.headers.authorization.split(" ");
+    if (
+      parts.length === 2 &&
+      parts[0] === "Bearer" &&
+      parts[1].match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    } else {
+      return res.status(401).json({ error: true, message: "Authorization header is malformed" });
+    }
   }
 
   if (!token) {
