@@ -52,6 +52,16 @@ app.use("/", volcanoRouter);
 app.use("/user", userRouter);
 app.get("/me", getMe);
 app.all("*", (req, res, next) => next(new AppError(`Not Found`, 404)));
+app.all('*', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
+  next();
+});
 app.use(globalErrorHandler);
 
 module.exports = app;
