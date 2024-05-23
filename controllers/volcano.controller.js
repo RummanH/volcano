@@ -71,14 +71,8 @@ async function httpGetOneVolcano(req, res, next) {
 
 
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    const parts = req.headers.authorization.split(' ');
-    if (parts.length === 2 && parts[0] === 'Bearer' && parts[1].match(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/)) {
       const token = req.headers.authorization.split(" ")[1];
       await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    } else {
-      return res.status(401).json({ error:true, message: 'Authorization header is malformed' });
-    }
-    
   }
 
   if (!req.headers.authorization) {
