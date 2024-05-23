@@ -50,7 +50,7 @@ async function httpLogin(req, res, next) {
 
   const token = await createJWT({ email: user[0].email });
   const decodedToken = jwt.decode(token);
-  const expires_in = decodedToken.exp;
+  const expires_in = new Date(decodedToken.exp);
 
   return res.status(200).json({ token: token, token_type: "Bearer", expires_in });
 }
