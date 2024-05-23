@@ -69,11 +69,21 @@ async function httpGetOneVolcano(req, res, next) {
     return res.status(404).json({ error: true, message: `Volcano with ID: ${id} not found.` });
   }
 
+  const authHeader = req.headers['authorization'];
+  if(authHeader){
+    const parts = authHeader.split(' ');
+    const token = parts[1];
+    if (parts.length !== 2 || parts[0] !== 'Bearer') {
+      return next(new AppError("Authorization header is malformed", 401))
+    }
 
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-      const token = req.headers.authorization.split(" ")[1];
-      await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    const pattern = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
+    if(!pattern.test(token)){
+      return next(new AppError("Invalid JWT token", 401))
+    }
+    await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   }
+
 
   if (!req.headers.authorization) {
     delete volcano.population_5km;

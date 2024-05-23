@@ -52,7 +52,7 @@ async function httpLogin(req, res, next) {
   const decodedToken = jwt.decode(token);
   const expires_in = new Date(decodedToken.exp * 1000);
 
-  return res.status(200).json({ token: token, token_type: "Bearer", expires_in });
+  return res.status(200).json({ token: token, token_type: "Bearer", expires_in:86400 });
 }
 
 module.exports = { httpRegister, httpLogin };
