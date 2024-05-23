@@ -25,10 +25,17 @@ async function httpGetAllVolcanos(req, res, next) {
 
   const populatedQuery = `population_${populatedWithin}`;
   // Build the base query
-  const volcanoes = await db("data").select("id", "name","country", "region", "subregion").where("country", country)
-  .andWhere(populatedQuery,">", 0);
-  // Add population conditions only if populatedWithin is provided
+  let query = db("data").select("id", "name","country", "region", "subregion").where("country", country)
   
+  // Add population conditions only if populatedWithin is provided
+
+  if(populatedWithin){
+    const populatedQuery = `population_${populatedWithin}`;
+    query = query.andWhere(function () {
+      this.andWhere(populatedQuery,">", 0)
+    })
+  }
+  const volcanoes = await query
   res.status(200).json(volcanoes);
 }
 
