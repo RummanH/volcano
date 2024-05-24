@@ -1,3 +1,5 @@
+// Custom error to handle any error through express global error handler
+
 class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
